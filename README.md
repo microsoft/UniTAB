@@ -1,7 +1,7 @@
 # UniTAB: Unifying Text and Box Outputs for Grounded VL Modeling
 [UniTAB: Unifying Text and Box Outputs for Grounded Vision-Language Modeling](https://arxiv.org/pdf/2111.12085.pdf)
 
-by [Zhengyuan Yang](zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), Faisal Ahmed, [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
+by [Zhengyuan Yang](zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), [Faisal Ahmed](https://scholar.google.com/citations?hl=en&user=laKl8acAAAAJ), [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
 
 European Conference on Computer Vision, 2022, Oral
 
@@ -24,7 +24,7 @@ For more details, please refer to our
       author={Yang, Zhengyuan and Gan, Zhe and Wang, Jianfeng and Hu, Xiaowei and Ahmed, Faisal and Liu, Zicheng and Lu, Yumao and Wang, Lijuan},
       booktitle={ECCV},
       year={2022}
-}
+
 
 ## Installation
 
@@ -114,12 +114,12 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickr
     </thead>
     <tbody>
         <tr>
-            <td>[Separate]</td>
+            <td>Separate</td>
             <td>65.6</td>
             <td>11.46</td>
         </tr>
         <tr>
-            <td>[Pre-finetuning]</td>
+            <td>Pre-finetuning</td>
             <td>69.7</td>
             <td>12.95 </td>
         </tr>
@@ -147,13 +147,13 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_refcoc
     </thead>
     <tbody>
         <tr>
-            <td>[Separate]</td>
+            <td>Separate</td>
             <td>86.32</td>
             <td>78.70</td>
             <td>79.96</td>
         </tr>
         <tr>
-            <td>[Pre-finetuning]</td>
+            <td>Pre-finetuning</td>
             <td>88.59</td>
             <td>80.97</td>
             <td>84.58</td>
@@ -180,11 +180,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickr
     </thead>
     <tbody>
         <tr>
-            <td>[Separate]</td>
+            <td>Separate</td>
             <td>79.39</td>
         </tr>
         <tr>
-            <td>[Pre-finetuning]</td>
+            <td>Pre-finetuning</td>
             <td>79.58</td>
         </tr>
     </tbody>
@@ -211,11 +211,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_MScoco
     </thead>
     <tbody>
         <tr>
-            <td>[Separate]</td>
+            <td>Separate</td>
             <td>119.3</td>
         </tr>
         <tr>
-            <td>[Pre-finetuning]</td>
+            <td>Pre-finetuning</td>
             <td>119.8</td>
         </tr>
     </tbody>
@@ -245,13 +245,13 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2_
     <tbody>
         <tr>
             <td>Separate</td>
-            <td>[69.9]</td>
-            <td>[66.6]</td>
+            <td>69.9</td>
+            <td>66.6</td>
         </tr>
         <tr>
             <td>Pre-finetuning</td>
-            <td>[70.7]</td>
-            <td>[67.5]</td>
+            <td>70.7</td>
+            <td>67.5</td>
         </tr>
     </tbody>
 </table>
