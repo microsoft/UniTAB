@@ -269,7 +269,7 @@ Example command (ngpu=16):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
 
-CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/prefinetune_VQAv2_checkpoint.pth
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/prefinetune_VQAv2_checkpoint.pth --eval --test
 ```
 
 ## Acknowledgement
