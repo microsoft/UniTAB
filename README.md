@@ -30,6 +30,7 @@ For more details, please refer to our
 Clone the repository:
 ```
 git clone https://github.com/microsoft/UniTAB.git
+cd UniTAB
 ```
 
 New conda env:
@@ -38,7 +39,7 @@ conda create -n unitab python=3.8
 conda activate unitab
 ```
 
-Install packages in ``requirements.txt``:
+Install packages in ``requirements.txt`` (separately install [numpy](https://pypi.org/project/numpy/) and [pytorch](pip3 install torch==1.8.2 torchvision==0.9.2 torchaudio==0.8.2 --extra-index-url https://download.pytorch.org/whl/lts/1.8/cu111) if fails):
 ```
 pip install -r requirements.txt
 ```
@@ -52,9 +53,9 @@ Example command:
 path/to/azcopy copy <folder-link> <target-address> --resursive"
 
 # For example:
-path/to/azcopy copy https://unitab.blob.core.windows.net/data/data <local_path>/data --recursive
-path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path>/weights --recursive
-path/to/azcopy copy https://unitab.blob.core.windows.net/data/annotations <local_path>/annotations --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/data <local_path> --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path> --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/annotations <local_path> --recursive
 ```
 
 ### Distributed Training
@@ -70,14 +71,14 @@ We do not specify ``distributed training`` tool in the example command. Pytorch 
 
 Or download the [cached data (~77G)](https://unitab.blob.core.windows.net/data/data) (use AzCopy with the link).
 
-* Download our pre-processed [annotations (~3.7G)](https://unitab.blob.core.windows.net/data/annotations) (use AzCopy with the link) and update the `flickr_ann_path`, `gqa_ann_path` and `refexp_ann_path` to this folder with pre-processed annotations.
+* Download our pre-processed [annotations (~3.7G)](https://unitab.blob.core.windows.net/data/annotations) (use AzCopy with the link, or [zip file](https://unitab.blob.core.windows.net/data/annotations.zip)) and update the `flickr_ann_path`, `gqa_ann_path` and `refexp_ann_path` to this folder with pre-processed annotations.
 
 ## Pre-train
 The config file for pretraining is ``configs/pretrain.json``. Optionally starting from [MDETR](https://github.com/ashkamath/mdetr/blob/main/.github/pretrain.md) pretrain with ``--load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth``. [Weights availble here](https://unitab.blob.core.windows.net/data/weights/pretrained_checkpoint.pth).
 
 Example command (ngpu=64):
 ```
-CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/pretrain.json --batch_size 2 --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --gvl_pretrain --pretrain_seqcrop mixed --ema --output-dir weights/$exp_id --load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/pretrain.json --batch_size 2 --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --unitab_pretrain --pretrain_seqcrop mixed --ema --output-dir weights/$exp_id --load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth
 ```
 
 ## Multi-task Finetuning
@@ -91,7 +92,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/multita
 ## Downstream tasks
 Optionally, downloading all weights at once (~54G):
 ```
-path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path>/weights --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path> --recursive
 ```
 
 For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
@@ -128,6 +129,8 @@ Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_f
 Example command (ngpu=8):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_kp.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
+
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_kp.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/prefinetune_flickrcaptionKP_checkpoint.pth --eval --test
 ```
 
 ### Referring expression comprehension
@@ -163,6 +166,8 @@ Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_r
 Example command (ngpu=8):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
+
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --output-dir weights/$exp_id --load weights/prefinetune_refcoco_checkpoint.pth --eval --test --test_type testA
 ```
 
 ### Phrase grounding
@@ -192,6 +197,8 @@ Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_f
 Example command (ngpu=8):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --do_flickrgrounding --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
+
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --do_flickrgrounding --output-dir weights/$exp_id --load weights/prefinetune_flickrGrounding_checkpoint.pth --eval --test
 ```
 
 ### COCO captioning
@@ -223,10 +230,12 @@ Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_M
 Example command (ngpu=16):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_cococaption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
+
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_cococaption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/prefinetune_MScococaption_checkpoint.pth --eval --test
 ```
 
 ### Visual question answering on VQAv2
-The config file for pretraining is ``configs/flickr_vqav2caption.json``. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits.
+The config file for pretraining is ``configs/flickr_vqav2caption.json`` and ``configs/flickr_vqav2captionKP.json``. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
@@ -258,6 +267,8 @@ Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_V
 Example command (ngpu=16):
 ```
 CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
+
+CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/prefinetune_VQAv2_checkpoint.pth
 ```
 
 ## Acknowledgement

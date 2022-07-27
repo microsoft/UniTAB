@@ -1,0 +1,10 @@
+{
+  "combine_datasets": ["flickr"],
+  "combine_datasets_val": ["flickr"],
+  "GT_type" : "vqav2captionKP",
+  "flickr_img_path" : "data/coco",
+  "flickr_dataset_path" : "",
+  "flickr_ann_path" : "annotations/",
+  "epochs": 20,
+  "lr_drop": 15
+}
