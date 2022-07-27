@@ -1,7 +1,7 @@
 # UniTAB: Unifying Text and Box Outputs for Grounded VL Modeling
 [UniTAB: Unifying Text and Box Outputs for Grounded Vision-Language Modeling](https://arxiv.org/pdf/2111.12085.pdf)
 
-by [Zhengyuan Yang](zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), [Faisal Ahmed](https://scholar.google.com/citations?hl=en&user=laKl8acAAAAJ), [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
+by [Zhengyuan Yang](https://zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), [Faisal Ahmed](https://scholar.google.com/citations?hl=en&user=laKl8acAAAAJ), [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
 
 European Conference on Computer Vision, 2022, Oral Presentation
 
@@ -23,6 +23,7 @@ For more details, please refer to our
       author={Yang, Zhengyuan and Gan, Zhe and Wang, Jianfeng and Hu, Xiaowei and Ahmed, Faisal and Liu, Zicheng and Lu, Yumao and Wang, Lijuan},
       booktitle={ECCV},
       year={2022}
+    }
 
 
 ## Installation
@@ -59,7 +60,7 @@ path/to/azcopy copy https://unitab.blob.core.windows.net/data/annotations <local
 ```
 
 ### Distributed Training
-We do not specify ``distributed training`` tool in the example commands below. Pytorch distributed ``python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py`` or [submitit](https://github.com/facebookincubator/submitit) supported. Or update ``util/dist/init_distributed_mode()`` to fit your cluster setting.
+We do not specify ``distributed training`` tool in the example commands below. Pytorch distributed ``python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py`` or [submitit](https://github.com/facebookincubator/submitit) supported. Or update ``util/dist.py/init_distributed_mode()`` to fit your cluster setting.
 
 
 ## Data
@@ -95,12 +96,12 @@ Optionally, downloading all weights at once (~54G):
 path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path> --recursive
 ```
 
-For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
+For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$exp_id/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
 ### Grounded captioning
 The config file for pretraining is ``configs/flickr_kp.json``. For model inference, use the input arguments ``--eval --test``. 
 
-For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description) evaluation. We will better intergrate the caption evaluations in future versions.
+For the final number, an output prediction json file will be automatically stored at ``weights/$exp_id/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description) evaluation. We will better intergrate the caption evaluations in future versions.
 
 Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_flickrcaptionKP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_flickrcaptionKP_checkpoint.pth).
 
@@ -204,7 +205,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.
 ### COCO captioning
 The config file for pretraining is ``configs/flickr_cococaption.json``. For model inference, use the input arguments ``--eval --test``. 
 
-For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [COCO captioning](https://github.com/tylin/coco-caption) evaluation. We will better intergrate the caption evaluations in future versions.
+For the final number, an output prediction json file will be automatically stored at ``weights/$exp_id/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [COCO captioning](https://github.com/tylin/coco-caption) evaluation. We will better intergrate the caption evaluations in future versions.
 
 Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_MScococaption_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_MScococaption_checkpoint.pth).
 
@@ -237,7 +238,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_
 ### Visual question answering on VQAv2
 The config file for pretraining is ``configs/flickr_vqav2caption.json`` and ``configs/flickr_vqav2captionKP.json``. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits. For model inference, use the input arguments ``--eval --test``. 
 
-For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
+For the final number, an output prediction json file will be automatically stored at ``weights/$exp_id/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
 Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_VQAv2_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_VQAv2_checkpoint.pth). KP split: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_VQAv2KP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_VQAv2KP_checkpoint.pth).
 
