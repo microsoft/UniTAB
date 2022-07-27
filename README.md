@@ -86,18 +86,18 @@ We do not specify ``distributed training`` tool in the example command. Pytorch 
 
 
 ## Multi-task Finetuning
-The config file for pretraining is ``configs/multitask.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. [Weights availble here](https://unitab.blob.core.windows.net/weights/prefinetune_checkpoint.pth).
+The config file for pretraining is ``configs/multitask.json``. [Weights availble here](https://unitab.blob.core.windows.net/weights/prefinetune_checkpoint.pth).
 
 Example command (ngpu=32):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/multitask.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 5e-5 --num_queries 200 --max_decoding_step 256 --load weights/$exp_id/BEST_checkpoint.pth --ema --output-dir weights/multitask_bestckpt_$exp_id
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/multitask.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 5e-5 --num_queries 200 --max_decoding_step 256 --load weights/pretrained_checkpoint.pth --ema --output-dir weights/$exp_id
     ```
 
 ## Downstream tasks
 For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
 ### Grounded captioning
-The config file for pretraining is ``configs/flickr_kp.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. 
+The config file for pretraining is ``configs/flickr_kp.json``.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description) evaluation. We will better intergrate the caption evaluations in future versions.
 
@@ -127,11 +127,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickr
 
 Example command (ngpu=8):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_kp.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/flickrcaptionKP_size1333_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_kp.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
     ```
 
 ### Referring expression comprehension
-The config file for pretraining is ``configs/refcoco/+/g.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. For model inference, use the input arguments ``--eval --test --test_type testA/testB/test``.
+The config file for pretraining is ``configs/refcoco/+/g.json``. For model inference, use the input arguments ``--eval --test --test_type testA/testB/test``.
 
 Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_refcoco_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_refcoco_checkpoint.pth) (refcoco/refcoco+/refcocog).
 
@@ -162,11 +162,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_refcoc
 
 Example command (ngpu=8):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --output-dir weights/refcoco_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
     ```
 
 ### Phrase grounding
-The config file for pretraining is ``configs/flickr.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. For model inference, use the input arguments ``--eval --test``.
+The config file for pretraining is ``configs/flickr.json``. For model inference, use the input arguments ``--eval --test``.
 
 Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickrGrounding_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_flickrGrounding_checkpoint.pth).
 
@@ -191,11 +191,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickr
 
 Example command (ngpu=8):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --do_flickrgrounding --output-dir weights/flickrGrounding_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --do_flickrgrounding --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
     ```
 
 ### COCO captioning
-The config file for pretraining is ``configs/flickr_cococaption.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. 
+The config file for pretraining is ``configs/flickr_cococaption.json``.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [COCO captioning](https://github.com/tylin/coco-caption) evaluation. We will better intergrate the caption evaluations in future versions.
 
@@ -222,11 +222,11 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_MScoco
 
 Example command (ngpu=16):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_cococaption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/MScococaption_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_cococaption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
     ```
 
 ### Visual question answering on VQAv2
-The config file for pretraining is ``configs/flickr_vqav2caption.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits.
+The config file for pretraining is ``configs/flickr_vqav2caption.json``. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
@@ -257,7 +257,7 @@ Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2_
 
 Example command (ngpu=16):
     ```
-    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/VQAv2caption_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/$exp_id --load weights/pretrained_checkpoint.pth
     ```
 
 ## Acknowledgement
