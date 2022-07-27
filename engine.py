@@ -162,7 +162,6 @@ def evaluate(
                 for im_id, sent_id, output in zip(image_ids, sentence_ids, flickr_results):
                     flickr_res.append({"image_id": im_id, "sentence_id": sent_id, "boxes": output})
 
-            ## match format of mdetr eval script
             if results[0]['boxes'].shape[0]==1:
                 for result in results:
                     result['scores'] = result['scores'].unsqueeze(1)[0]

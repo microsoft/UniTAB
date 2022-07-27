@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 ### AzCopy
 We recommend using the following AzCopy command to download.
-AzCopy executable tools can be downloaded [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#download-azcopy).
+AzCopy executable tools can be [downloaded here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#download-azcopy).
 
 Example command:
 ```
