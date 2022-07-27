@@ -185,11 +185,14 @@ def evaluate(
     for evaluator in evaluator_list:
         evaluator.synchronize_between_processes()
 
+    refexp_res = None
     flickr_res = None
     for evaluator in evaluator_list:
         if isinstance(evaluator, CocoEvaluator):
             evaluator.accumulate()
             evaluator.summarize()
+        elif isinstance(evaluator, (RefExpEvaluator)):
+            refexp_res = evaluator.summarize()
         elif isinstance(evaluator, (FlickrEvaluator, FlickrCaptionEvaluator)):
             flickr_res = evaluator.summarize()
 
@@ -199,6 +202,9 @@ def evaluate(
         if isinstance(evaluator, CocoEvaluator):
             if "bbox" in postprocessors.keys():
                 stats["coco_eval_bbox"] = evaluator.coco_eval["bbox"].stats.tolist()
+
+    if refexp_res is not None:
+        stats.update(refexp_res)
 
     if flickr_res is not None:
         stats["flickr"] = flickr_res

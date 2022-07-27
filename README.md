@@ -3,7 +3,7 @@
 
 by [Zhengyuan Yang](zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), [Faisal Ahmed](https://scholar.google.com/citations?hl=en&user=laKl8acAAAAJ), [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
 
-European Conference on Computer Vision, 2022, Oral
+European Conference on Computer Vision, 2022, Oral Presentation
 
 
 ### Introduction
@@ -39,7 +39,7 @@ conda create -n unitab python=3.8
 conda activate unitab
 ```
 
-Install packages in ``requirements.txt`` (separately install [numpy](https://pypi.org/project/numpy/) and [pytorch](pip3 install torch==1.8.2 torchvision==0.9.2 torchaudio==0.8.2 --extra-index-url https://download.pytorch.org/whl/lts/1.8/cu111) if fails):
+Install packages in ``requirements.txt`` (separately install [numpy](https://pypi.org/project/numpy/) and [pytorch (LTS 1.8.2)](https://pytorch.org/get-started/locally/) if fails):
 ```
 pip install -r requirements.txt
 ```
@@ -59,7 +59,7 @@ path/to/azcopy copy https://unitab.blob.core.windows.net/data/annotations <local
 ```
 
 ### Distributed Training
-We do not specify ``distributed training`` tool in the example command. Pytorch distributed ``python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py`` or [submitit](https://github.com/facebookincubator/submitit) supported. Or update ``util/dist/init_distributed_mode()`` to fit your cluster setting.
+We do not specify ``distributed training`` tool in the example commands below. Pytorch distributed ``python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py`` or [submitit](https://github.com/facebookincubator/submitit) supported. Or update ``util/dist/init_distributed_mode()`` to fit your cluster setting.
 
 
 ## Data
