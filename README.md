@@ -11,10 +11,9 @@ We propose UniTAB, a vision-language (VL) model that unifies text generation and
 For more details, please refer to our
 [paper](https://arxiv.org/pdf/2111.12085.pdf).
 
-<!-- Note: This codebase is still in beta release. We are continue organizing the repo and completing the doumentations. Meanwhile, please feel free to contact me regarding any issue and request for clarification. -->
 
 <p align="center">
-  <img src="https://zyang-ur.github.io//unitab/unitab.jpg" width="75%"/>
+  <img src="https://zyang-ur.github.io//unitab/unitab.jpg" width="100%"/>
 </p>
 
 ### Citation
@@ -53,9 +52,9 @@ Example command:
 path/to/azcopy copy <folder-link> <target-address> --resursive"
 
 # For example:
-path/to/azcopy copy https://unitab.blob.core.windows.net/data <local_path>/data --recursive
-path/to/azcopy copy https://unitab.blob.core.windows.net/weights <local_path>/weights --recursive
-path/to/azcopy copy https://unitab.blob.core.windows.net/annotations <local_path>/annotations --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/data <local_path>/data --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path>/weights --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/annotations <local_path>/annotations --recursive
 ```
 
 ### Distributed Training
@@ -69,12 +68,12 @@ We do not specify ``distributed training`` tool in the example command. Pytorch 
 * Download the gqa images at [GQA images](https://nlp.stanford.edu/data/gqa/images.zip) and update `vg_img_path` to point to the folder containing the images.
 * Download COCO images [Coco train2014](http://images.cocodataset.org/zips/train2014.zip). Update the `coco_path` to the folder containing the downloaded images.
 
-Or download the [cached data (~77G)](https://unitab.blob.core.windows.net/data) (use AzCopy with the link).
+Or download the [cached data (~77G)](https://unitab.blob.core.windows.net/data/data) (use AzCopy with the link).
 
-* Download our pre-processed [annotations (~3.7G)](https://unitab.blob.core.windows.net/annotations) (use AzCopy with the link) and update the `flickr_ann_path`, `gqa_ann_path` and `refexp_ann_path` to this folder with pre-processed annotations.
+* Download our pre-processed [annotations (~3.7G)](https://unitab.blob.core.windows.net/data/annotations) (use AzCopy with the link) and update the `flickr_ann_path`, `gqa_ann_path` and `refexp_ann_path` to this folder with pre-processed annotations.
 
 ## Pre-train
-The config file for pretraining is ``configs/pretrain.json``. Optionally starting from [MDETR](https://github.com/ashkamath/mdetr/blob/main/.github/pretrain.md) pretrain with ``--load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth``. [Weights availble here](https://unitab.blob.core.windows.net/weights/pretrained_checkpoint.pth).
+The config file for pretraining is ``configs/pretrain.json``. Optionally starting from [MDETR](https://github.com/ashkamath/mdetr/blob/main/.github/pretrain.md) pretrain with ``--load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth``. [Weights availble here](https://unitab.blob.core.windows.net/data/weights/pretrained_checkpoint.pth).
 
 Example command (ngpu=64):
 ```
@@ -82,7 +81,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/pretrai
 ```
 
 ## Multi-task Finetuning
-The config file for pretraining is ``configs/multitask.json``. [Weights availble here](https://unitab.blob.core.windows.net/weights/prefinetune_checkpoint.pth).
+The config file for pretraining is ``configs/multitask.json``. [Weights availble here](https://unitab.blob.core.windows.net/data/weights/prefinetune_checkpoint.pth).
 
 Example command (ngpu=32):
 ```
@@ -92,7 +91,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/multita
 ## Downstream tasks
 Optionally, downloading all weights at once (~54G):
 ```
-path/to/azcopy copy https://unitab.blob.core.windows.net/weights <local_path>/weights --recursive
+path/to/azcopy copy https://unitab.blob.core.windows.net/data/weights <local_path>/weights --recursive
 ```
 
 For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
@@ -102,7 +101,7 @@ The config file for pretraining is ``configs/flickr_kp.json``.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description) evaluation. We will better intergrate the caption evaluations in future versions.
 
-Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickrcaptionKP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_flickrcaptionKP_checkpoint.pth).
+Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_flickrcaptionKP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_flickrcaptionKP_checkpoint.pth).
 
 <table>
     <thead>
@@ -134,7 +133,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_
 ### Referring expression comprehension
 The config file for pretraining is ``configs/refcoco/+/g.json``. For model inference, use the input arguments ``--eval --test --test_type testA/testB/test``.
 
-Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_refcoco_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_refcoco_checkpoint.pth) (refcoco/refcoco+/refcocog).
+Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_refcoco_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_refcoco_checkpoint.pth) (refcoco/refcoco+/refcocog).
 
 <table>
     <thead>
@@ -169,7 +168,7 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco
 ### Phrase grounding
 The config file for pretraining is ``configs/flickr.json``. For model inference, use the input arguments ``--eval --test``.
 
-Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickrGrounding_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_flickrGrounding_checkpoint.pth).
+Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_flickrGrounding_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_flickrGrounding_checkpoint.pth).
 
 <table>
     <thead>
@@ -200,7 +199,7 @@ The config file for pretraining is ``configs/flickr_cococaption.json``.
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [COCO captioning](https://github.com/tylin/coco-caption) evaluation. We will better intergrate the caption evaluations in future versions.
 
-Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_MScococaption_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_MScococaption_checkpoint.pth).
+Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_MScococaption_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_MScococaption_checkpoint.pth).
 
 <table>
     <thead>
@@ -231,7 +230,7 @@ The config file for pretraining is ``configs/flickr_vqav2caption.json``. Adjust 
 
 For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
 
-Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_VQAv2_checkpoint.pth). KP split: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2KP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_VQAv2KP_checkpoint.pth).
+Weights: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_VQAv2_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_VQAv2_checkpoint.pth). KP split: [Separate](https://unitab.blob.core.windows.net/data/weights/separate_VQAv2KP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/data/weights/prefinetune_VQAv2KP_checkpoint.pth).
 
 
 <table>
