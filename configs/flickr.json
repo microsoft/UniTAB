@@ -1,0 +1,10 @@
+{
+  "combine_datasets": ["flickr"],
+  "combine_datasets_val": ["flickr"],
+  "GT_type" : "merged",
+  "flickr_img_path" : "data/Flickr30k/flickr30k_images_split/",
+  "flickr_dataset_path" : "data/Flickr30k/",
+  "flickr_ann_path" : "annotations/",
+  "epochs": 20,
+  "lr_drop": 15
+}

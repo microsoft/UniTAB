@@ -1,16 +1,271 @@
-# Project
+# UniTAB: Unifying Text and Box Outputs for Grounded VL Modeling
+[UniTAB: Unifying Text and Box Outputs for Grounded Vision-Language Modeling](https://arxiv.org/pdf/2111.12085.pdf)
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+by [Zhengyuan Yang](zhengyuan.info), [Zhe Gan](https://zhegan27.github.io/), [Jianfeng Wang](http://jianfengwang.me/), [Xiaowei Hu](https://scholar.google.com/citations?user=Pj0TwxwAAAAJ&hl=en), Faisal Ahmed, [Zicheng Liu](https://zicliu.wixsite.com/mysite), [Yumao Lu](https://www.linkedin.com/in/yumao/), [Lijuan Wang](https://www.microsoft.com/en-us/research/people/lijuanw/)
 
-As the maintainer of this project, please make a few updates:
+European Conference on Computer Vision, 2022, Oral
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
 
-## Contributing
+### Introduction
+We propose UniTAB, a vision-language (VL) model that unifies text generation and bounding box prediction into a single architecture.
+For more details, please refer to our
+[paper](https://arxiv.org/pdf/2111.12085.pdf).
+
+<!-- Note: This codebase is still in beta release. We are continue organizing the repo and completing the doumentations. Meanwhile, please feel free to contact me regarding any issue and request for clarification. -->
+
+<p align="center">
+  <img src="https://zyang-ur.github.io//unitab/unitab.jpg" width="75%"/>
+</p>
+
+### Citation
+
+    @inproceedings{yang2022unitab,
+      title={UniTAB: Unifying Text and Box Outputs for Grounded Vision-Language Modeling},
+      author={Yang, Zhengyuan and Gan, Zhe and Wang, Jianfeng and Hu, Xiaowei and Ahmed, Faisal and Liu, Zicheng and Lu, Yumao and Wang, Lijuan},
+      booktitle={ECCV},
+      year={2022}
+}
+
+## Installation
+
+Clone the repository:
+
+    ```
+    git clone https://github.com/microsoft/UniTAB.git
+    ```
+
+New conda env:
+
+    ```
+    conda create -n unitab python=3.8
+    conda activate unitab
+    ```
+
+Install packages in ``requirements.txt``:
+    ```
+    pip install -r requirements.txt
+    ```
+
+### AzCopy
+We recommend using the following AzCopy command to download.
+AzCopy executable tools can be downloaded [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#download-azcopy).
+
+Example command:
+```
+path/to/azcopy copy <folder-link> <target-address> --resursive"
+
+# for example, downloading model checkpoints
+path/to/azcopy copy https://unitab.blob.core.windows.net/data <local_path>/data --recursive
+```
+
+## Data
+
+* Download the original Flickr30k image dataset from : [Flickr30K webpage](http://shannon.cs.illinois.edu/DenotationGraph/) and update the `flickr_img_path` to the folder containing the images.
+* Download the original Flickr30k entities annotations from: [Flickr30k annotations](https://github.com/BryanPlummer/flickr30k_entities) and update the `flickr_dataset_path` to the folder with annotations.
+* Download the gqa images at [GQA images](https://nlp.stanford.edu/data/gqa/images.zip) and update `vg_img_path` to point to the folder containing the images.
+* Download COCO images [Coco train2014](http://images.cocodataset.org/zips/train2014.zip). Update the `coco_path` to the folder containing the downloaded images.
+
+Or download the [cached data (~77G)](https://unitab.blob.core.windows.net/data) (use AzCopy with the link).
+
+* Download our pre-processed [annotations (~3.7G)](https://unitab.blob.core.windows.net/annotations) (use AzCopy with the link) and update the `flickr_ann_path`, `gqa_ann_path` and `refexp_ann_path` to this folder with pre-processed annotations.
+
+## Pre-train
+Optionally, downloading all weights at once (~54G):
+```
+path/to/azcopy copy https://unitab.blob.core.windows.net/weights <local_path>/weights --recursive
+```
+
+The config file for pretraining is ``configs/pretrain.json``. Optionally starting from [MDETR](https://github.com/ashkamath/mdetr/blob/main/.github/pretrain.md) pretrain with ``--load``. [Weights availble here](https://unitab.blob.core.windows.net/weights/pretrained_checkpoint.pth).
+
+Example command (ngpu=64):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/pretrain.json --batch_size 2 --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --gvl_pretrain --pretrain_seqcrop mixed --ema --output-dir weights/$exp_id --load https://zenodo.org/record/4721981/files/pretrained_resnet101_checkpoint.pth
+    ```
+
+We do not specify ``distributed training`` tool in the example command. Pytorch distributed ``python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py`` or [submitit](https://github.com/facebookincubator/submitit) availble. Or update ``util/dist/init_distributed_mode()`` for your cluster setting.
+
+
+## Multi-task Finetuning
+The config file for pretraining is ``configs/multitask.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. [Weights availble here](https://unitab.blob.core.windows.net/weights/prefinetune_checkpoint.pth).
+
+Example command (ngpu=32):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/multitask.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 5e-5 --num_queries 200 --max_decoding_step 256 --load weights/$exp_id/BEST_checkpoint.pth --ema --output-dir weights/multitask_bestckpt_$exp_id
+    ```
+
+## Downstream tasks
+For model inference, use the input arguments ``--eval --test``. For captioning tests (Flickr grounded captioning, COCO image captioning, VQAv2 visual question answering), the computed captioning metrics displayed is only for reference. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description), [COCO captioning](https://github.com/tylin/coco-caption), and [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
+
+### Grounded captioning
+The config file for pretraining is ``configs/flickr_kp.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. 
+
+For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [Flickr grounded captioning](https://github.com/facebookresearch/grounded-video-description) evaluation. We will better intergrate the caption evaluations in future versions.
+
+Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickrcaptionKP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_flickrcaptionKP_checkpoint.pth).
+
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>CIDEr</th>
+            <th>F1_all</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[Separate]</td>
+            <td>65.6</td>
+            <td>11.46</td>
+        </tr>
+        <tr>
+            <td>[Pre-finetuning]</td>
+            <td>69.7</td>
+            <td>12.95 </td>
+        </tr>
+    </tbody>
+</table>
+
+Example command (ngpu=8):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_kp.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 1e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/flickrcaptionKP_size1333_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    ```
+
+### Referring expression comprehension
+The config file for pretraining is ``configs/refcoco/+/g.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. For model inference, use the input arguments ``--eval --test --test_type testA/testB/test``.
+
+Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_refcoco_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_refcoco_checkpoint.pth) (refcoco/refcoco+/refcocog).
+
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>Refcoco</th>
+            <th>Refcoco+</th>
+            <th>Refcocog</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[Separate]</td>
+            <td>86.32</td>
+            <td>78.70</td>
+            <td>79.96</td>
+        </tr>
+        <tr>
+            <td>[Pre-finetuning]</td>
+            <td>88.59</td>
+            <td>80.97</td>
+            <td>84.58</td>
+        </tr>
+    </tbody>
+</table>
+
+Example command (ngpu=8):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/refcoco.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --output-dir weights/refcoco_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    ```
+
+### Phrase grounding
+The config file for pretraining is ``configs/flickr.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. For model inference, use the input arguments ``--eval --test``.
+
+Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_flickrGrounding_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_flickrGrounding_checkpoint.pth).
+
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>Flickr</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[Separate]</td>
+            <td>79.39</td>
+        </tr>
+        <tr>
+            <td>[Pre-finetuning]</td>
+            <td>79.58</td>
+        </tr>
+    </tbody>
+</table>
+
+Example command (ngpu=8):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr.json --batch_size 2 --lr_backbone 1e-5 --text_encoder_lr 5e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --ema --do_flickrgrounding --output-dir weights/flickrGrounding_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    ```
+
+### COCO captioning
+The config file for pretraining is ``configs/flickr_cococaption.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. 
+
+For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [COCO captioning](https://github.com/tylin/coco-caption) evaluation. We will better intergrate the caption evaluations in future versions.
+
+Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_MScococaption_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_MScococaption_checkpoint.pth).
+
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>CIDEr</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[Separate]</td>
+            <td>119.3</td>
+        </tr>
+        <tr>
+            <td>[Pre-finetuning]</td>
+            <td>119.8</td>
+        </tr>
+    </tbody>
+</table>
+
+Example command (ngpu=16):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_cococaption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/MScococaption_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    ```
+
+### Visual question answering on VQAv2
+The config file for pretraining is ``configs/flickr_vqav2caption.json``. ``$exp_id`` is the name of the pretrained checkpoint folder. Adjust the ``GT_type`` between ``vqav2caption`` and ``vqav2captionKP`` for std and KP splits.
+
+For model inference, use the input arguments ``--eval --test``. For the final number, an output prediction json file will be automatically stored at ``weights/$output_folder/results/pred_dict_$CIDEr.json``. Please follow the official evaluation for [VQAv2](https://visualqa.org/evaluation.html) evaluation. We will better intergrate the caption evaluations in future versions.
+
+Weights: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_VQAv2_checkpoint.pth). KP split: [Separate](https://unitab.blob.core.windows.net/weights/separate_VQAv2KP_checkpoint.pth), [Pre-finetuning](https://unitab.blob.core.windows.net/weights/prefinetune_VQAv2KP_checkpoint.pth).
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>test-dev</th>
+            <th>KP-test</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Separate</td>
+            <td>[69.9]</td>
+            <td>[66.6]</td>
+        </tr>
+        <tr>
+            <td>Pre-finetuning</td>
+            <td>[70.7]</td>
+            <td>[67.5]</td>
+        </tr>
+    </tbody>
+</table>
+
+Example command (ngpu=16):
+    ```
+    CUBLAS_WORKSPACE_CONFIG=:4096:8  python main.py --dataset_config configs/flickr_vqav2caption.json --lr_backbone 2e-5 --text_encoder_lr 2e-5 --lr 1e-4 --num_queries 200 --max_decoding_step 256 --do_caption --no_detection --ema --output-dir weights/VQAv2caption_size1333_bestckpt_$exp_id --load weights/$exp_id/BEST_checkpoint.pth
+    ```
+
+## Acknowledgement
+The project is built based on the following repository:
+* [MDETR--Modulated Detection for End-to-End Multi-Modal Understanding](https://github.com/ashkamath/mdetr),
+* [transformers](https://github.com/huggingface/transformers).
+
+### Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -24,7 +279,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## Trademarks
+### Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
 trademarks or logos is subject to and must follow 

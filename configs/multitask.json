@@ -1,0 +1,15 @@
+{
+    "combine_datasets": ["refexp","refexp","refexp","flickr", "flickr","flickr", "flickr"],
+    "combine_datasets_val": ["refexp"],
+    "coco_path": ["data/coco","data/coco","data/coco","data/coco","data/coco","data/coco","data/coco"],
+    "vg_img_path": "data/gqa/images",
+    "flickr_img_path": ["none","none","none","data/Flickr30k/flickr30k_images_split/","data/Flickr30k/flickr30k_images_split/","data/coco","data/coco"],
+    "refexp_ann_path": "annotations",
+    "flickr_ann_path": "annotations",
+    "gqa_ann_path": "annotations",
+    "refexp_dataset_name": ["refcoco","refcoco+","refcocog","none","none","none","none"],
+    "GT_type": ["none","none","none","mergedGT_pretrain","mergedGT_pretrain","vqav2caption","mscococaption"],
+    "flickr_dataset_path": "data/Flickr30k/",
+    "epochs": 20,
+    "lr_drop": 15
+}
