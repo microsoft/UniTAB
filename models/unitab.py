@@ -41,7 +41,8 @@ def target2prevind(caption_idx, targets, num_bins=None, text_vocab=50265):
         begin_tokens, end_tokens, convert_seq = [], [], []
         for obj_i in range(target_bbox.shape[0]):
             token_idx = positive_map_idx[1][positive_map_idx[0]==obj_i]
-
+            if token_idx.shape[0]==0:   ## two samples in refcocog training has box with no corresponding words. Skip as follow, or append box in the end.
+                continue
             begin_idx, end_idx = int(torch.min(token_idx)), int(torch.max(token_idx))+1
             span = int(1./positive_map[obj_i,token_idx[0]])
             if span!=(end_idx-begin_idx):
